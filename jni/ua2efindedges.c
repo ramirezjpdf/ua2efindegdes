@@ -1,10 +1,10 @@
-#include <jsni.h>
+#include <jni.h>
 #include<android/log.h>
-#include<andorid/bitmap.h>
+#include<android/bitmap.h>
 
 #define LOG_TAG "libua2efindedges"
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA__ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 typedef struct
 {
@@ -44,9 +44,9 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_converttogra
 	}
 
 	LOGI("gray image :: width is %d; height is %d; stride is %d; format is %d; flags is %d", infogray.width, infogray.height, infogray.stride, infogray.format, infogray.flags);
-	if(infogray.format != ANDROID_BITMAP_FORMAT_A_8888)
+	if(infogray.format != ANDROID_BITMAP_FORMAT_A_8)
 	{
-		LOGE("Bitmap from bitmapgray format is not A_8888!");
+		LOGE("Bitmap from bitmapgray format is not A_8!");
 		return;
 	}
 
@@ -60,10 +60,10 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_converttogra
 	}
 
 	//finally image processing algorithm for modifying pixels
-	for(y = 0; y < infocolor.height; i++)
+	for(y = 0; y < infocolor.height; y++)
 	{
 		argb* line = (argb*) pixelscolor;
-		uint8_t* grayline = (uint8_t) pixelsgray;
+		uint8_t* grayline = (uint8_t*) pixelsgray;
 		for(x = 0; x < infocolor.width; x++)
 		{
 			grayline[x] = 0.3 * line[x].red + 0.59 * line[x].green + 0.11 * line[x].blue;
@@ -115,13 +115,13 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectedges(
 	}
 
 	LOGI("gray image :: width is %d; height is %d; stride is %d; format is %d; flags is %d", infogray.width, infogray.height, infogray.stride, infogray.format, infogray.flags);
-	if(infogray.format != ANDROID_BITMAP_FORMAT_A_8888)
+	if(infogray.format != ANDROID_BITMAP_FORMAT_A_8)
 	{
 		LOGE("Bitmap from bitmapgray format is not A_8888!");
 		return;
 	}
 	LOGI("edge image :: width is %d; height is %d; stride is %d; format is %d; flags is %d", infoedges.width, infoedges.height, infoedges.stride, infoedges.format, infoedges.flags);
-	if(infoedges.format != ANDROID_BITMAP_FORMAT_A_8888)
+	if(infoedges.format != ANDROID_BITMAP_FORMAT_A_8)
 	{
 		LOGE("Bitmap from bitmapedges format is not A_8888!");
 		return;
@@ -149,8 +149,38 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectedges(
 			//check boundaries
 			if(y == 0 || y == infogray.height - 1)
 			{
-
+				sum = 0;
 			}
+			else if(x == 0 || x == infogray.width - 1)
+			{
+				sum = 0;
+			}
+			else
+			{
+				//calc X gradient
+				for(i = -1; i <= 1; i++)
+				{
+					for(j = -1; j <= 1; j++)
+					{
+						sumX += (int) ((*(graydata + x + i + (y + j) * infogray.stride)) * Gx[i + 1][j + 1]);
+					}
+				}
+				//calc Y gradient
+				for(i = -1; i <= 1; i++)
+				{
+					for(j = -1; j <= 1; j++)
+					{
+						sumY += (int) ((*(graydata + x + 1 + (y + j) * infogray.stride)) * Gy[i + 1][j + 1]);
+					}
+				}
+				sum = abs(sumX) + abs(sumY);
+			}
+			if (sum > 255) sum = 255;
+			if (sum < 0 ) sum = 0;
+
+			*(edgedata + x + y * infogray.width) = 255 - (uint8_t) sum;
 		}
+		AndroidBitmap_unlockPixels(env, bitmapgray);
+		AndroidBitmap_unlockPixels(env, bitmapedges);
 	}
 }
