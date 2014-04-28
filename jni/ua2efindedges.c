@@ -77,7 +77,7 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_converttogra
 	AndroidBitmap_unlockPixels(env, bitmapgray);
 }
 
-JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectedges(JNIEnv* env, jobject obj, jobject bitmapgray, jobject bitmapedges)
+JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectededges(JNIEnv* env, jobject obj, jobject bitmapgray, jobject bitmapedges)
 {
 	AndroidBitmapInfo infogray;
 	void* pixelsgray;
