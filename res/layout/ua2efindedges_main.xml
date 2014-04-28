@@ -4,15 +4,15 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#ffffffff"
+    android:background="#00000000"
     tools:context=".UA2EFindEdges" >
 
     <LinearLayout 
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="#ffffffff"
-        android:gravity="center">
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        android:gravity="top">
         
         <Button android:id="@+id/AcquireImage"
             android:layout_width="wrap_content"
