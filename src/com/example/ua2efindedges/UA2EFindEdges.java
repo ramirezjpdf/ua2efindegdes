@@ -54,6 +54,7 @@ public class UA2EFindEdges extends Activity {
         			Bitmap be = Bitmap.createBitmap(width, height, Config.ALPHA_8);
         			converttogray(b, bg);
         			detectededges(bg, be);
+        			app.setB(be);
         			imageView.setImageBitmap(be);
         			btnFindEdges.setVisibility(View.GONE);
         		}catch(Exception e){

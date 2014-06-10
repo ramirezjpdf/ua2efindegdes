@@ -24,6 +24,7 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_converttogra
 	int y;
 	int x;
 
+	LOGI("converttogray enter");
 	if ((ret = AndroidBitmap_getInfo(env, bitmapcolor, &infocolor)) < 0)
 	{
 		LOGE("AndridBitmap_getInfo(bitmapcolor) failed! error=%d", ret);
@@ -32,7 +33,7 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_converttogra
 
 	if((ret = AndroidBitmap_getInfo(env, bitmapgray, &infogray)) < 0)
 	{
-		LOGE("AndroidBitmap_getInfo(bitmapgray) falied! error=%d", ret);
+		LOGE("AndroidBitmap_getInfo(bitmapgray) failed! error=%d", ret);
 		return;
 	}
 
@@ -59,6 +60,7 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_converttogra
 		LOGE("AndroidBitmap_lockPixels for bitmapgray failed! ereor=%d", ret);
 	}
 
+	LOGI("converttogray beginning algorithm");
 	//finally image processing algorithm for modifying pixels
 	for(y = 0; y < infocolor.height; y++)
 	{
@@ -72,9 +74,11 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_converttogra
 		pixelscolor = (char*)pixelscolor + infocolor.stride;
 		pixelsgray = (char*)pixelsgray + infogray.stride;
 	}
+	LOGI("converttogray ending algorithm");
 
 	AndroidBitmap_unlockPixels(env, bitmapcolor);
 	AndroidBitmap_unlockPixels(env, bitmapgray);
+	LOGI("exiting converttogray");
 }
 
 JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectededges(JNIEnv* env, jobject obj, jobject bitmapgray, jobject bitmapedges)
@@ -105,12 +109,12 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectededge
 
 	if((ret = AndroidBitmap_getInfo(env, bitmapgray, &infogray)) < 0)
 	{
-		LOGE("AndroidBitmap_getInfo(bitmapgray) falied! error=%d", ret);
+		LOGE("AndroidBitmap_getInfo(bitmapgray) failed! error=%d", ret);
 		return;
 	}
 	if((ret = AndroidBitmap_getInfo(env, bitmapedges, &infoedges)) < 0)
 	{
-		LOGE("AndroidBitmap_getInfo(bitmapedges) falied! error=%d", ret);
+		LOGE("AndroidBitmap_getInfo(bitmapedges) failed! error=%d", ret);
 		return;
 	}
 
@@ -137,12 +141,13 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectededge
 	}
 
 	//finally the image processing algorithm for modifying the image
+	LOGI("detect edges Beginning algorithm");
 	graydata = (uint8_t*) pixelsgray;
 	edgedata = (uint8_t*) pixelsedge;
 
-	for(y = 0;y < infogray.height - 1; y++)
+	for(y = 0;y <= infogray.height - 1; y++)
 	{
-		for(x = 0; x < infogray.width; x++)
+		for(x = 0; x < infogray.width - 1; x++)
 		{
 			sumX = 0;
 			sumY = 0;
@@ -170,7 +175,7 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectededge
 				{
 					for(j = -1; j <= 1; j++)
 					{
-						sumY += (int) ((*(graydata + x + 1 + (y + j) * infogray.stride)) * Gy[i + 1][j + 1]);
+						sumY += (int) ((*(graydata + x + i + (y + j) * infogray.stride)) * Gy[i + 1][j + 1]);
 					}
 				}
 				sum = abs(sumX) + abs(sumY);
@@ -180,7 +185,10 @@ JNIEXPORT void JNICALL Java_com_example_ua2efindedges_UA2EFindEdges_detectededge
 
 			*(edgedata + x + y * infogray.width) = 255 - (uint8_t) sum;
 		}
-		AndroidBitmap_unlockPixels(env, bitmapgray);
-		AndroidBitmap_unlockPixels(env, bitmapedges);
 	}
+	LOGI("detectedges Reached end of algorithm");
+	AndroidBitmap_unlockPixels(env, bitmapgray);
+	AndroidBitmap_unlockPixels(env, bitmapedges);
+	LOGI("Exiting detectedEdges");
+	LOGI("detectededges. JA PUS P FORA DO FOR!!!!!");
 }
